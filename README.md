@@ -7,8 +7,8 @@ DeferredErrors is a small go package that allows you to defer error handling unt
 
 // Some setup (pardon the compressed formatting)
 type Foo struct { }
-func (f *Foo) SomethingIsTrue() error { return true, nil }
-func (f *Foo) SomethingElseIsTrue() error { return true, nil }
+func (f *Foo) SomethingIsTrue() (bool error) { return true, nil }
+func (f *Foo) SomethingElseIsTrue() (bool error) { return true, nil }
 func (f *Foo) DoSomething() error { return nil }
 func (f *Foo) MakeItRain() error { return nil }
 
