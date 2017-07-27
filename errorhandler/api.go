@@ -5,12 +5,13 @@ package errorhandler
 // Because false is returned when an action is ignored (rather than halting execution), it is important
 // to ensure any downstream methods are also wrapped in Try methods, so they are also ignored.
 func (d *DeferredErrorContext) TryBool(action func() (bool, error)) bool {
-	if d.LocalError == nil {
-		result, err := action()
-		d.LocalError = err
-		return result
+	if d.LocalError != nil {
+		return false
 	}
-	return false
+
+	result, err := action()
+	d.LocalError = err
+	return result
 }
 
 // TryVoid executes a func() error action if no previous Trys have resulted in a error.
@@ -26,18 +27,16 @@ func (d *DeferredErrorContext) ChainF(action func(interface{}) (interface{}, err
 	if d.LocalError != nil {
 		return
 	}
-
-	result, err:= action(arg.Value)
+	result, err := action(d.PreviousActionResult)
 	d.LocalError = err
-	d.injectionValue = result
-
+	d.PreviousActionResult = result
 }
 
 // FlushChain returns the current local error and resets the context back to its default state.
 func (d *DeferredErrorContext) FlushChain() error {
 	localError := d.LocalError
 	d.LocalError = nil
-	d.injectionValue = nil
+	d.PreviousActionResult = nil
 	return localError
 }
 

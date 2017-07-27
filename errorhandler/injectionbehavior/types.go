@@ -7,12 +7,12 @@ const (
 	// NotSpecified means that no behavior has been declared. This value is assumed to mean UsePrevious
 	NotSpecified InjectionBehavior = iota
 
-	// UsePrevious means that your intention is to inject the value supplied by the previous action in the chain.
+	// InjectPreviousResult means that your intention is to inject the value supplied by the previous action in the chain.
 	// If no previous action was present in the chain, nil is injected.
 	// If a value is supplied in the Argument to the chain function, it is ignored.
-	UsePrevious
+	InjectPreviousResult
 
-	// OverridePrevious means that your intention is to inject the value supplied in the Argument.
+	// InjectSuppliedValue means that your intention is to inject the value supplied in the Argument.
 	// If a previous value is presnet in the chain, it is ignored.
-	OverridePrevious
+	InjectSuppliedValue
 )

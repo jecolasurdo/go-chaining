@@ -121,9 +121,24 @@ func Test_ChainF_NoPreviousError_ExecutesAction(t *testing.T) {
 	assert.Equal(t, 1, timesActionWasCalled)
 }
 
-// Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_UsesPrevious
-// Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_UsesPrevious
-// Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_UsesSuppliedValue
+func Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
+	d := new(errorhandler.DeferredErrorContext)
+	injectedValue := ""
+	action := func(value interface{}) (interface{}, error) {
+		injectedValue = value.(string)
+		return nil, nil
+	}
+	argWithBehaviorNotSpecified := errorhandler.ActionArg{}
+	simulatedValueOfPreviousActionInChain := "somevalue"
+	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
+
+	d.ChainF(action, argWithBehaviorNotSpecified)
+
+	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
+}
+
+// Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue
+// Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue
 // Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsInjectionValueWithOutput
 
 func Test_FlushChain_Normally_ResetsErrorToNil(t *testing.T) {
