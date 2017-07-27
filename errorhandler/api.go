@@ -1,10 +1,5 @@
 package errorhandler
 
-// DeferredErrorContext is a mechanism for deferring execution of methods if an error condition has been received.
-type DeferredErrorContext struct {
-	LocalError error
-}
-
 // TryBool executes a func() (bool, error) if no previous Trys have resulted in an error.
 // If previous Trys have resulted in an error, the action is ignored, not executed, and false is returned.
 // Because false is returned when an action is ignored (rather than halting execution), it is important
@@ -26,9 +21,33 @@ func (d *DeferredErrorContext) TryVoid(action func() error) {
 	}
 }
 
-// FlushError returns the current local error and resets the error back to nil.
-func (d *DeferredErrorContext) FlushError() error {
+// ChainF does something
+func (d *DeferredErrorContext) ChainF(action func(interface{}) (interface{}, error), arg ActionArg) {
+	if d.LocalError != nil {
+		return
+	}
+
+	result, err:= action(arg.Value)
+	d.LocalError = err
+	d.injectionValue = result
+
+}
+
+// FlushChain returns the current local error and resets the context back to its default state.
+func (d *DeferredErrorContext) FlushChain() error {
 	localError := d.LocalError
 	d.LocalError = nil
+	d.injectionValue = nil
 	return localError
 }
+
+//TODO: Add new methods:
+// FlushError gets renamed to Flush, resets the context returns a value also (always, even if nil)
+// ChainBool(action func(interface{}) (bool, error), value interface{}, overridePrevious bool = false) bool
+// ChainVoid(action func(interface{}) error, value interface{}, overridePrevious bool = false)
+// ChainF(action func(interface{}) (interface{}, error), value interface{}, overridePrevious bool = false)
+// How ChainF works:
+//   value is passed into the closure as its argument.
+//   The closure is executed and returns an interface and error.
+//   Both the interface and error are cached in the context object
+//   The next time ChainF is executed, the value from the previous method is used as the input for the next.
