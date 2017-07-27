@@ -176,7 +176,29 @@ func Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue
 	assert.Equal(t, valueSubmittedThroughArg, injectedValue)
 }
 
-// Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsInjectionValueWithOutput
+func Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
+	d := new(errorhandler.DeferredErrorContext)
+	expectedReturnValue := "expectedReturnValue"
+	action := func(value interface{}) (interface{}, error) { return expectedReturnValue, nil }
+	arg := errorhandler.ActionArg{
+		Value: "valueFromArg",
+	}
+
+	d.PreviousActionResult = nil
+	arg.Behavior = injectionbehavior.InjectSuppliedValue
+	d.ChainF(action, arg)
+	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
+
+	d.PreviousActionResult = nil
+	arg.Behavior = injectionbehavior.InjectPreviousResult
+	d.ChainF(action, arg)
+	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
+
+	d.PreviousActionResult = nil
+	arg.Behavior = injectionbehavior.NotSpecified
+	d.ChainF(action, arg)
+	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
+}
 
 func Test_FlushChain_Normally_ResetsErrorToNil(t *testing.T) {
 	d := new(errorhandler.DeferredErrorContext)
