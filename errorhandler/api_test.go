@@ -2,6 +2,7 @@ package errorhandler_test
 
 import (
 	"errors"
+	"jecolasurdo/go-deferrederrors/errorhandler/injectionbehavior"
 	"testing"
 
 	"jecolasurdo/go-deferrederrors/errorhandler"
@@ -137,8 +138,44 @@ func Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *
 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
 }
 
-// Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue
-// Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue
+func Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
+	d := new(errorhandler.DeferredErrorContext)
+	injectedValue := ""
+	action := func(value interface{}) (interface{}, error) {
+		injectedValue = value.(string)
+		return nil, nil
+	}
+	argWithSpecifiedBehavior := errorhandler.ActionArg{
+		Behavior: injectionbehavior.InjectPreviousResult,
+	}
+	simulatedValueOfPreviousActionInChain := "somevalue"
+	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
+
+	d.ChainF(action, argWithSpecifiedBehavior)
+
+	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
+}
+
+func Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
+	d := new(errorhandler.DeferredErrorContext)
+	injectedValue := ""
+	action := func(value interface{}) (interface{}, error) {
+		injectedValue = value.(string)
+		return nil, nil
+	}
+	valueSubmittedThroughArg := "valueFromArg"
+	argWithSpecifiedBehavior := errorhandler.ActionArg{
+		Behavior: injectionbehavior.InjectSuppliedValue,
+		Value:    valueSubmittedThroughArg,
+	}
+	simulatedValueOfPreviousActionInChain := "previousValue"
+	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
+
+	d.ChainF(action, argWithSpecifiedBehavior)
+
+	assert.Equal(t, valueSubmittedThroughArg, injectedValue)
+}
+
 // Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsInjectionValueWithOutput
 
 func Test_FlushChain_Normally_ResetsErrorToNil(t *testing.T) {

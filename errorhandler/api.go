@@ -1,5 +1,9 @@
 package errorhandler
 
+import (
+	"jecolasurdo/go-deferrederrors/errorhandler/injectionbehavior"
+)
+
 // TryBool executes a func() (bool, error) if no previous Trys have resulted in an error.
 // If previous Trys have resulted in an error, the action is ignored, not executed, and false is returned.
 // Because false is returned when an action is ignored (rather than halting execution), it is important
@@ -27,7 +31,13 @@ func (d *DeferredErrorContext) ChainF(action func(interface{}) (interface{}, err
 	if d.LocalError != nil {
 		return
 	}
-	result, err := action(d.PreviousActionResult)
+	var valueToInject interface{}
+	if arg.Behavior == injectionbehavior.InjectSuppliedValue {
+		valueToInject = arg.Value
+	} else {
+		valueToInject = d.PreviousActionResult
+	}
+	result, err := action(valueToInject)
 	d.LocalError = err
 	d.PreviousActionResult = result
 }
