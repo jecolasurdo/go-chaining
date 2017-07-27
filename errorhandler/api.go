@@ -42,21 +42,82 @@ func (d *DeferredErrorContext) ChainF(action func(interface{}) (interface{}, err
 	d.PreviousActionResult = result
 }
 
-// FlushChain returns the current local error and resets the context back to its default state.
-func (d *DeferredErrorContext) FlushChain() error {
+// Flush returns the context's error and final result, and resets the context back to its default state.
+func (d *DeferredErrorContext) Flush() (interface{}, error) {
 	localError := d.LocalError
+	finalResult := d.PreviousActionResult
 	d.LocalError = nil
 	d.PreviousActionResult = nil
-	return localError
+	return finalResult, localError
 }
 
-//TODO: Add new methods:
-// FlushError gets renamed to Flush, resets the context returns a value also (always, even if nil)
-// ChainBool(action func(interface{}) (bool, error), value interface{}, overridePrevious bool = false) bool
-// ChainVoid(action func(interface{}) error, value interface{}, overridePrevious bool = false)
-// ChainF(action func(interface{}) (interface{}, error), value interface{}, overridePrevious bool = false)
-// How ChainF works:
-//   value is passed into the closure as its argument.
-//   The closure is executed and returns an interface and error.
-//   Both the interface and error are cached in the context object
-//   The next time ChainF is executed, the value from the previous method is used as the input for the next.
+// NullaryVoid executes an action which takes no arguments and returns only an error.
+//
+// Since the supplied action returns no value aside from an error, the context will supply nil as a pseudo-result
+// for the supplied action. The context will then apply that nil to the next action called within the context,
+// unless the override behavior for the next action dictates otherwise.
+//
+// The error returned by the supplied action is also applied to the current context.
+// If error is not nil, subsequent actions executed within the same context will be ignored.
+func (d *DeferredErrorContext) NullaryVoid(action func() error) {}
+
+// NullaryIface executes an action which takes no arguments and returns a tuple of (interface{}, error).
+//
+// The context will apply the supplied action's interface{} result to the next action called within the context,
+// unless the override behavior for the next action dictates otherwise.
+//
+// The error returned by the supplied action is also applied to the current context.
+// If error is not nil, subsequent actions executed within the same context will be ignored.
+func (d *DeferredErrorContext) NullaryIface(action func() (interface{}, error)) {}
+
+// UnaryVoid executes an action which takes one argument returns only an error.
+//
+// The single interface{} argument accepted by the action can be supplied via the arg parameter.
+//
+// Since the supplied action returns no value aside from an error, the context will supply nil as a pseudo-result
+// for the supplied action. The context will then apply that nil to the next action called within the context,
+// unless the override behavior for the next action dictates otherwise.
+//
+// The error returned by the supplied action is also applied to the current context.
+// If error is not nil, subsequent actions executed within the same context will be ignored.
+func (d *DeferredErrorContext) UnaryVoid(action func(interface{}) error, arg ActionArg) {}
+
+// UnaryIface executes an action which takes one argument, and returns a tuple of (interface{}, error).
+//
+// The single interface{} argument accepted by the action can be supplied via the arg parameter.
+//
+// The context will apply the supplied action's interface{} result to the next action called within the context,
+// unless the override behavior for the next action dictates otherwise.
+//
+// The error returned by the supplied action is also applied to the current context.
+// If error is not nil, subsequent actions executed within the same context will be ignored.
+func (d *DeferredErrorContext) UnaryIface(action func(interface{}) (interface{}, error), arg ActionArg) {
+}
+
+// NullaryBool executes an action which takes no arguments and returns a tuple of (bool, error).
+//
+// The context will apply the supplied action's bool result to the next action called within the context,
+// unless the override behavior for the next action dictates otherwise.
+//
+// The error returned by the supplied action is also applied to the current context.
+// If error is not nil, subsequent actions executed within the same context will be ignored.
+//
+// In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
+// This is useful for inlining the method in boolean statements.
+func (d *DeferredErrorContext) NullaryBool(action func() (bool, error)) bool { return false }
+
+// UnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
+//
+// The single interface{} argument accepted by the action can be supplied via the arg parameter.
+//
+// The context will apply the supplied action's bool result to the next action called within the context,
+// unless the override behavior for the next action dictates otherwise.
+//
+// The error returned by the supplied action is also applied to the current context.
+// If error is not nil, subsequent actions executed within the same context will be ignored.
+//
+// In addition to threading the (bool, error) tuple into the current context, UnaryBool itself also returns a bool.
+// This is useful for inlining the method in boolean statements.
+func (d *DeferredErrorContext) UnaryBool(action func(interface{}) (bool, error), arg ActionArg) bool {
+	return false
+}

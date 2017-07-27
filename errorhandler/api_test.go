@@ -200,23 +200,25 @@ func Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResul
 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
 }
 
-func Test_FlushChain_Normally_ResetsErrorToNil(t *testing.T) {
+func Test_Flush_Normally_ResetsContext(t *testing.T) {
 	d := new(errorhandler.DeferredErrorContext)
 	d.LocalError = errors.New("test error")
-	d.FlushChain()
+	d.PreviousActionResult = "Not nil"
+
+	d.Flush()
+
 	assert.Nil(t, d.LocalError)
+	assert.Nil(t, d.PreviousActionResult)
 }
 
-func Test_FlushChain_Normally_ReturnsAnyEror(t *testing.T) {
+func Test__Normally_ReturnsErrorAndFinalResult(t *testing.T) {
 	d := new(errorhandler.DeferredErrorContext)
 	d.LocalError = errors.New("test error")
-	err := d.FlushChain()
-	assert.NotNil(t, err)
-}
+	expectedFinalResult := "FinalResult"
+	d.PreviousActionResult = expectedFinalResult
 
-// ChainF(action func(interface{}) (interface{}, error), value interface{}, overridePrevious bool = false)
-// How ChainF works:
-//   value is passed into the closure as its argument.
-//   The closure is executed and returns an interface and error.
-//   Both the interface and error are cached in the context object
-//   The next time ChainF is executed, the value from the previous method is used as the input for the next.
+	result, err := d.Flush()
+
+	assert.NotNil(t, err)
+	assert.Equal(t, expectedFinalResult, result)
+}
