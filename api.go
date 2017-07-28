@@ -1,7 +1,6 @@
 package chaining
 
 import "jecolasurdo/go-chaining/injectionbehavior"
-import "errors"
 
 // Flush returns the context's error and final result, and resets the context back to its default state.
 func (c *Context) Flush() (interface{}, error) {
@@ -51,8 +50,11 @@ func (c *Context) ApplyNullaryIface(action func() (interface{}, error), behavior
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
 func (c *Context) ApplyUnary(action func(interface{}) error, arg ActionArg) {
-	c.LocalError = errors.New("ApplyUnary not implemented")
-	c.PreviousActionResult = nil
+	restatedAction := func(val interface{}) (interface{}, error) {
+		err := action(val)
+		return nil, err
+	}
+	c.ApplyUnaryIface(restatedAction, arg)
 }
 
 // ApplyUnaryIface executes an action which takes one argument, and returns a tuple of (interface{}, error).
