@@ -75,25 +75,26 @@ func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousV
 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
 }
 
-// func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
-// 	d := new(chaining.Context)
-// 	injectedValue := ""
-// 	action := func(value interface{}) (interface{}, error) {
-// 		injectedValue = value.(string)
-// 		return nil, nil
-// 	}
-// 	valueSubmittedThroughArg := "valueFromArg"
-// 	argWithSpecifiedBehavior := chaining.ActionArg{
-// 		Behavior: injectionbehavior.InjectSuppliedValue,
-// 		Value:    valueSubmittedThroughArg,
-// 	}
-// 	simulatedValueOfPreviousActionInChain := "previousValue"
-// 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
+func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
+	a := new(atomic.Context)
+	c := new(chaining.Context)
+	injectedValue := ""
+	action := func(value interface{}) (interface{}, error) {
+		injectedValue = value.(string)
+		return nil, nil
+	}
+	valueSubmittedThroughArg := "valueFromArg"
+	argWithSpecifiedBehavior := chaining.ActionArg{
+		Behavior: injectionbehavior.InjectSuppliedValue,
+		Value:    valueSubmittedThroughArg,
+	}
+	simulatedValueOfPreviousActionInChain := "previousValue"
+	c.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
-// 	d.ApplyUnaryIface(action, argWithSpecifiedBehavior)
+	a.ApplyUnaryIface(action, &argWithSpecifiedBehavior, c)
 
-// 	assert.Equal(t, valueSubmittedThroughArg, injectedValue)
-// }
+	assert.Equal(t, valueSubmittedThroughArg, injectedValue)
+}
 
 // func Test_ApplyUnaryIface_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
 // 	d := new(chaining.Context)
