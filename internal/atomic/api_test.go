@@ -38,21 +38,22 @@ func Test_ApplyUnaryIface_NoPreviousError_ExecutesAction(t *testing.T) {
 	assert.Equal(t, 1, timesActionWasCalled)
 }
 
-// func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
-// 	d := new(chaining.Context)
-// 	injectedValue := ""
-// 	action := func(value interface{}) (interface{}, error) {
-// 		injectedValue = value.(string)
-// 		return nil, nil
-// 	}
-// 	argWithBehaviorNotSpecified := chaining.ActionArg{}
-// 	simulatedValueOfPreviousActionInChain := "somevalue"
-// 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
+func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
+	a := new(atomic.Context)
+	c := new(chaining.Context)
+	injectedValue := ""
+	action := func(value interface{}) (interface{}, error) {
+		injectedValue = value.(string)
+		return nil, nil
+	}
+	argWithBehaviorNotSpecified := chaining.ActionArg{}
+	simulatedValueOfPreviousActionInChain := "somevalue"
+	c.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
-// 	d.ApplyUnaryIface(action, argWithBehaviorNotSpecified)
+	a.ApplyUnaryIface(action, &argWithBehaviorNotSpecified, c)
 
-// 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
-// }
+	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
+}
 
 // func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
 // 	d := new(chaining.Context)
