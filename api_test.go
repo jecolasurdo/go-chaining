@@ -58,7 +58,7 @@ func Test_TryBool_ActionErrors_SetsLocalError(t *testing.T) {
 	assert.NotNil(t, d.LocalError)
 }
 
-func Test_TryVoid_NoPreviousError_ExecutesAction(t *testing.T) {
+func Test_TryVoid_NoPreviousError_ExcutesAction(t *testing.T) {
 	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() error {

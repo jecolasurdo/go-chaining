@@ -42,18 +42,18 @@ func (f *Foo) Flar() error {
     return nil
 }
 
-// Same nested if statement with deferred error handling.
+// Same nested if statements with deferred error handling.
 func (f *Foo) Flar() error {
-	e := new(chaining.Context)
-	if e.ExecNullaryBool(f.SomethingIsTrue) {
-		if e.ExecNullaryBool(f.SomethingElseIsTrue) {
-			e.ExecNullaryVoid(f.DoSomething)
-			e.ExecNullaryVoid(f.MakeItRain)
+	c := new(chaining.Context)
+	if c.ApplyNullaryBool(f.SomethingIsTrue) {
+		if c.ApplyNullaryBool(f.SomethingElseIsTrue) {
+			c.ApplyNullary(f.DoSomething)
+			c.ApplyNullary(f.MakeItRain)
 		}
 	} else {
-		e.ExecNullaryVoid(f.MakeItRain)
+		c.ApplyNullary(f.MakeItRain)
 	}
-    _, err:= e.Flush()
+    _, err:= c.Flush()
 	return err
 }
 
