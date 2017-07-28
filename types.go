@@ -6,7 +6,7 @@ import (
 
 // Context is a mechanism for deferring execution of methods if an error condition has been received.
 type Context struct {
-	atomicFunc           func(func(interface{}) (interface{}, error), ActionArg)
+	atomicFunc           func(*Context, func(interface{}) (interface{}, error), ActionArg)
 	LocalError           error
 	PreviousActionResult *interface{}
 }
