@@ -90,14 +90,10 @@ func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error),
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
 func (c *Context) ApplyNullaryBool(action func() (bool, error), behavior injectionbehavior.InjectionBehavior) bool {
-	restatedAction := func(val interface{}) (interface{}, error) {
+	restatedAction := func(interface{}) (bool, error) {
 		return action()
 	}
-	c.AtomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
-	if c.LocalError != nil {
-		return false
-	}
-	return (*c.PreviousActionResult).(bool)
+	return c.ApplyUnaryBool(restatedAction, ActionArg{Behavior: behavior})
 }
 
 // ApplyUnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
