@@ -96,26 +96,27 @@ func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsOverridePrevious_InjectsSupp
 	assert.Equal(t, valueSubmittedThroughArg, injectedValue)
 }
 
-// func Test_ApplyUnaryIface_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
-// 	d := new(chaining.Context)
-// 	expectedReturnValue := "expectedReturnValue"
-// 	action := func(value interface{}) (interface{}, error) { return expectedReturnValue, nil }
-// 	arg := chaining.ActionArg{
-// 		Value: "valueFromArg",
-// 	}
+func Test_ApplyUnaryIface_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
+	a := new(atomic.Context)
+	c := new(chaining.Context)
+	expectedReturnValue := "expectedReturnValue"
+	action := func(value interface{}) (interface{}, error) { return expectedReturnValue, nil }
+	arg := chaining.ActionArg{
+		Value: "valueFromArg",
+	}
 
-// 	d.PreviousActionResult = nil
-// 	arg.Behavior = injectionbehavior.InjectSuppliedValue
-// 	d.ApplyUnaryIface(action, arg)
-// 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
+	c.PreviousActionResult = nil
+	arg.Behavior = injectionbehavior.InjectSuppliedValue
+	a.ApplyUnaryIface(action, &arg, c)
+	assert.Equal(t, expectedReturnValue, c.PreviousActionResult)
 
-// 	d.PreviousActionResult = nil
-// 	arg.Behavior = injectionbehavior.InjectPreviousResult
-// 	d.ApplyUnaryIface(action, arg)
-// 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
+	c.PreviousActionResult = nil
+	arg.Behavior = injectionbehavior.InjectPreviousResult
+	a.ApplyUnaryIface(action, &arg, c)
+	assert.Equal(t, expectedReturnValue, c.PreviousActionResult)
 
-// 	d.PreviousActionResult = nil
-// 	arg.Behavior = injectionbehavior.NotSpecified
-// 	d.ApplyUnaryIface(action, arg)
-// 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
-// }
+	c.PreviousActionResult = nil
+	arg.Behavior = injectionbehavior.NotSpecified
+	a.ApplyUnaryIface(action, &arg, c)
+	assert.Equal(t, expectedReturnValue, c.PreviousActionResult)
+}
