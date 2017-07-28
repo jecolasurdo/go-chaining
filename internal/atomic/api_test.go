@@ -18,25 +18,25 @@ func Test_ApplyUnaryIface_PreviousError_IgnoresAction(t *testing.T) {
 		return nil, nil
 	}
 
-	arg := chaining.ActionArg{}
 	c.LocalError = errors.New("test error")
-	a.ApplyUnaryIface(action, &arg, c)
+	a.ApplyUnaryIface(action, &chaining.ActionArg{}, c)
 
 	assert.Equal(t, 0, timesActionWasCalled)
 }
 
-// func Test_ApplyUnaryIface_NoPreviousError_ExecutesAction(t *testing.T) {
-// 	d := new(chaining.Context)
-// 	timesActionWasCalled := 0
-// 	action := func(interface{}) (interface{}, error) {
-// 		timesActionWasCalled++
-// 		return nil, nil
-// 	}
+func Test_ApplyUnaryIface_NoPreviousError_ExecutesAction(t *testing.T) {
+	a := new(atomic.Context)
+	c := new(chaining.Context)
+	timesActionWasCalled := 0
+	action := func(interface{}) (interface{}, error) {
+		timesActionWasCalled++
+		return nil, nil
+	}
 
-// 	d.ApplyUnaryIface(action, chaining.ActionArg{})
+	a.ApplyUnaryIface(action, &chaining.ActionArg{}, c)
 
-// 	assert.Equal(t, 1, timesActionWasCalled)
-// }
+	assert.Equal(t, 1, timesActionWasCalled)
+}
 
 // func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
 // 	d := new(chaining.Context)
