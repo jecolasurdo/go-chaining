@@ -19,11 +19,11 @@ func (c *Context) Flush() (interface{}, error) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) ApplyNullary(action func() error) {
-	TODO: Restate in terms of ApplyUnaryIface
-	if c.LocalError == nil {
-		c.LocalError = action()
+func (c *Context) ApplyNullary(action func() error, behavior injectionbehavior.InjectionBehavior) {
+	restatedAction := func(val interface{}) (interface{}, error) {
+		return nil, action()
 	}
+	c.ApplyUnaryIface(restatedAction, ActionArg{Behavior: behavior})
 }
 
 // ApplyNullaryIface executes an action which takes no arguments and returns a tuple of (interface{}, error).
@@ -52,8 +52,7 @@ func (c *Context) ApplyNullaryIface(action func() (interface{}, error), behavior
 // If error is not nil, subsequent actions executed within the same context will be ignored.
 func (c *Context) ApplyUnary(action func(interface{}) error, arg ActionArg) {
 	restatedAction := func(val interface{}) (interface{}, error) {
-		err := action(val)
-		return nil, err
+		return nil, action(val)
 	}
 	c.ApplyUnaryIface(restatedAction, arg)
 }
@@ -92,15 +91,11 @@ func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error),
 //
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (c *Context) ApplyNullaryBool(action func() (bool, error)) bool {
-	TODO: Restate in terms of ApplyUnaryIface
-	if c.LocalError != nil {
-		return false
+func (c *Context) ApplyNullaryBool(action func() (bool, error), arg ActionArg) bool {
+	restatedAction := func(val interface{}) (interface{}, error) {
+		return action()
 	}
-
-	result, err := action()
-	c.LocalError = err
-	return result
+	c.ApplyUnaryIface(restatedAction, arg)
 }
 
 // ApplyUnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
