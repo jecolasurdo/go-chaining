@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"jecolasurdo/go-chaining"
-	"jecolasurdo/go-chaining/injection"
+	"jecolasurdo/go-chaining/behavior"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -68,7 +68,7 @@ func Test_AtomicFunction_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousVa
 		return nil, nil
 	}
 	argWithSpecifiedBehavior := chaining.ActionArg{
-		Behavior: injection.InjectPreviousResult,
+		Behavior: behavior.InjectPreviousResult,
 	}
 	var simulatedValueOfPreviousActionInChain interface{} = "somevalue"
 	d.PreviousActionResult = &simulatedValueOfPreviousActionInChain
@@ -87,7 +87,7 @@ func Test_AtomicFunction_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppl
 	}
 	valueSubmittedThroughArg := "valueFromArg"
 	argWithSpecifiedBehavior := chaining.ActionArg{
-		Behavior: injection.InjectSuppliedValue,
+		Behavior: behavior.InjectSuppliedValue,
 		Value:    valueSubmittedThroughArg,
 	}
 	var simulatedValueOfPreviousActionInChain interface{} = "previousValue"
@@ -107,17 +107,17 @@ func Test_AtomicFunction_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousAct
 	}
 
 	d.PreviousActionResult = nil
-	arg.Behavior = injection.InjectSuppliedValue
+	arg.Behavior = behavior.InjectSuppliedValue
 	d.ApplyUnaryIface(action, arg)
 	assert.Equal(t, &expectedReturnValue, d.PreviousActionResult)
 
 	d.PreviousActionResult = nil
-	arg.Behavior = injection.InjectPreviousResult
+	arg.Behavior = behavior.InjectPreviousResult
 	d.ApplyUnaryIface(action, arg)
 	assert.Equal(t, &expectedReturnValue, d.PreviousActionResult)
 
 	d.PreviousActionResult = nil
-	arg.Behavior = injection.NotSpecified
+	arg.Behavior = behavior.NotSpecified
 	d.ApplyUnaryIface(action, arg)
 	assert.Equal(t, &expectedReturnValue, d.PreviousActionResult)
 }
@@ -148,14 +148,14 @@ func ResetTestParameters() {
 func Test_ApplyNullary_Normally_CallsAtomic(t *testing.T) {
 	ResetTestParameters()
 	action := func() error { return nil }
-	mockContext.ApplyNullary(action, injection.NotSpecified)
+	mockContext.ApplyNullary(action, behavior.NotSpecified)
 	assert.Equal(t, 1, numberOfTimesAtomicCalled)
 }
 
 func Test_ApplyNullaryIface_Normally_CallsAtomic(t *testing.T) {
 	ResetTestParameters()
 	action := func() (interface{}, error) { return nil, nil }
-	mockContext.ApplyNullaryIface(action, injection.NotSpecified)
+	mockContext.ApplyNullaryIface(action, behavior.NotSpecified)
 	assert.Equal(t, 1, numberOfTimesAtomicCalled)
 }
 
@@ -176,7 +176,7 @@ func Test_ApplyUnaryIface_Normally_CallsAtomic(t *testing.T) {
 func Test_ApplyNullaryBool_Normally_CallsAtomic(t *testing.T) {
 	ResetTestParameters()
 	action := func() (bool, error) { return false, nil }
-	mockContext.ApplyNullaryBool(action, injection.NotSpecified)
+	mockContext.ApplyNullaryBool(action, behavior.NotSpecified)
 	assert.Equal(t, 1, numberOfTimesAtomicCalled)
 }
 
@@ -194,14 +194,14 @@ func Test_ApplyUnaryBool_Normally_CallsAtomic(t *testing.T) {
 func Test_ApplyNullaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
 	d := chaining.New()
 	trueAction := func() (bool, error) { return true, nil }
-	result := d.ApplyNullaryBool(trueAction, injection.NotSpecified)
+	result := d.ApplyNullaryBool(trueAction, behavior.NotSpecified)
 	assert.True(t, result)
 }
 
 func Test_ApplyNullaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
 	d := chaining.New()
 	falseAction := func() (bool, error) { return false, nil }
-	result := d.ApplyNullaryBool(falseAction, injection.NotSpecified)
+	result := d.ApplyNullaryBool(falseAction, behavior.NotSpecified)
 	assert.False(t, result)
 }
 
@@ -212,7 +212,7 @@ func Test_ApplyNullaryBool_PreviousError_ReturnsFalse(t *testing.T) {
 	}
 
 	d.LocalError = errors.New("test error")
-	result := d.ApplyNullaryBool(trueAction, injection.NotSpecified)
+	result := d.ApplyNullaryBool(trueAction, behavior.NotSpecified)
 
 	assert.False(t, result)
 }

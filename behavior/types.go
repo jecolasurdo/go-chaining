@@ -1,12 +1,12 @@
-// Package injection provides mechanism for controlling how values are threaded through the execution chain.
-package injection
+// Package behavior provides mechanism for controlling how values are threaded through the execution chain.
+package behavior
 
-// Behavior instructs the system on how to thread values through the chain of actions.
-type Behavior int
+// InjectionOption instructs the system on how to thread values through the chain of actions.
+type InjectionOption int
 
 const (
 	// NotSpecified means that no behavior has been declared. This value is assumed to mean UsePrevious
-	NotSpecified Behavior = iota
+	NotSpecified InjectionOption = iota
 
 	// InjectPreviousResult means that your intention is to inject the value supplied by the previous action in the chain.
 	// If no previous action was present in the chain, nil is injected.

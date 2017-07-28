@@ -2,7 +2,7 @@
 package chaining
 
 import (
-	"jecolasurdo/go-chaining/injection"
+	"jecolasurdo/go-chaining/behavior"
 )
 
 // New returns an instance of a chaining Context.
@@ -29,7 +29,7 @@ func (c *Context) Flush() (interface{}, error) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) ApplyNullary(action func() error, behavior injection.Behavior) {
+func (c *Context) ApplyNullary(action func() error, behavior behavior.InjectionOption) {
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return nil, action()
 	}
@@ -43,7 +43,7 @@ func (c *Context) ApplyNullary(action func() error, behavior injection.Behavior)
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) ApplyNullaryIface(action func() (interface{}, error), behavior injection.Behavior) {
+func (c *Context) ApplyNullaryIface(action func() (interface{}, error), behavior behavior.InjectionOption) {
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return action()
 	}
@@ -90,7 +90,7 @@ func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error),
 //
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (c *Context) ApplyNullaryBool(action func() (bool, error), behavior injection.Behavior) bool {
+func (c *Context) ApplyNullaryBool(action func() (bool, error), behavior behavior.InjectionOption) bool {
 	restatedAction := func(interface{}) (bool, error) {
 		return action()
 	}
@@ -125,7 +125,7 @@ func atomic(c *Context, action func(interface{}) (interface{}, error), arg Actio
 		return
 	}
 	var valueToInject interface{}
-	if arg.Behavior == injection.InjectSuppliedValue {
+	if arg.Behavior == behavior.InjectSuppliedValue {
 		valueToInject = arg.Value
 	} else {
 		valueToInject = c.PreviousActionResult

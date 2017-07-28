@@ -1,8 +1,6 @@
 package chaining
 
-import (
-	"jecolasurdo/go-chaining/injection"
-)
+import "jecolasurdo/go-chaining/behavior"
 
 // Context is a mechanism for deferring execution of methods if an error condition has been received.
 type Context struct {
@@ -14,5 +12,5 @@ type Context struct {
 // ActionArg is the information passed into a chain function that describe the intended behavior.
 type ActionArg struct {
 	Value    interface{}
-	Behavior injection.Behavior
+	Behavior behavior.InjectionOption
 }
