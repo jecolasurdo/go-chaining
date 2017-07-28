@@ -9,21 +9,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_TryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
+func Test_ApplyNullaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
 	d := new(chaining.Context)
 	trueAction := func() (bool, error) { return true, nil }
-	result := d.TryBool(trueAction)
+	result := d.ApplyNullaryBool(trueAction)
 	assert.True(t, result)
 }
 
-func Test_TryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
+func Test_ApplyNullaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
 	d := new(chaining.Context)
 	falseAction := func() (bool, error) { return false, nil }
-	result := d.TryBool(falseAction)
+	result := d.ApplyNullaryBool(falseAction)
 	assert.False(t, result)
 }
 
-func Test_TryBool_PreviousError_IgnoresAction(t *testing.T) {
+func Test_ApplyNullaryBool_PreviousError_IgnoresAction(t *testing.T) {
 	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() (bool, error) {
@@ -32,28 +32,28 @@ func Test_TryBool_PreviousError_IgnoresAction(t *testing.T) {
 	}
 
 	d.LocalError = errors.New("test error")
-	d.TryBool(action)
+	d.ApplyNullaryBool(action)
 
 	assert.Equal(t, 0, timesActionWasCalled)
 }
 
-func Test_TryBool_PreviousError_ReturnsFalse(t *testing.T) {
+func Test_ApplyNullaryBool_PreviousError_ReturnsFalse(t *testing.T) {
 	d := new(chaining.Context)
 	trueAction := func() (bool, error) {
 		return true, nil
 	}
 
 	d.LocalError = errors.New("test error")
-	result := d.TryBool(trueAction)
+	result := d.ApplyNullaryBool(trueAction)
 
 	assert.False(t, result)
 }
 
-func Test_TryBool_ActionErrors_SetsLocalError(t *testing.T) {
+func Test_ApplyNullaryBool_ActionErrors_SetsLocalError(t *testing.T) {
 	d := new(chaining.Context)
 	errorAction := func() (bool, error) { return false, errors.New("test error") }
 
-	d.TryBool(errorAction)
+	d.ApplyNullaryBool(errorAction)
 
 	assert.NotNil(t, d.LocalError)
 }

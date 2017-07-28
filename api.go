@@ -2,20 +2,6 @@ package chaining
 
 import "jecolasurdo/go-chaining/injectionbehavior"
 
-// TryBool executes a func() (bool, error) if no previous Trys have resulted in an error.
-// If previous Trys have resulted in an error, the action is ignored, not executed, and false is returned.
-// Because false is returned when an action is ignored (rather than halting execution), it is important
-// to ensure any downstream methods are also wrapped in Try methods, so they are also ignored.
-func (c *Context) TryBool(action func() (bool, error)) bool {
-	if c.LocalError != nil {
-		return false
-	}
-
-	result, err := action()
-	c.LocalError = err
-	return result
-}
-
 // TryVoid executes a func() error action if no previous Trys have resulted in a error.
 // If previous Trys have resulted in an error, the action is ignored and not executed.
 func (c *Context) TryVoid(action func() error) {
@@ -98,7 +84,15 @@ func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error),
 //
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (c *Context) ApplyNullaryBool(action func() (bool, error)) bool { return false }
+func (c *Context) ApplyNullaryBool(action func() (bool, error)) bool {
+	if c.LocalError != nil {
+		return false
+	}
+
+	result, err := action()
+	c.LocalError = err
+	return result
+}
 
 // ApplyUnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
 //
