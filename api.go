@@ -33,9 +33,11 @@ func (c *Context) ApplyNullary(action func() error) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) ApplyNullaryIface(action func() (interface{}, error)) {
-	c.LocalError = errors.New("ApplyNullaryIface not implemented")
-	c.PreviousActionResult = nil
+func (c *Context) ApplyNullaryIface(action func() (interface{}, error), behavior injectionbehavior.InjectionBehavior) {
+	restatedAction := func(val interface{}) (interface{}, error) {
+		return action()
+	}
+	c.ApplyUnaryIface(restatedAction, ActionArg{Behavior: behavior})
 }
 
 // ApplyUnary executes an action which takes one argument returns only an error.
