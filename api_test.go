@@ -11,7 +11,7 @@ import (
 )
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Nullary Boolean Function Tests
+/// Special Nullary Boolean Function Tests
 ///
 
 func Test_ApplyNullaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
@@ -41,15 +41,105 @@ func Test_ApplyNullaryBool_PreviousError_ReturnsFalse(t *testing.T) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// Unary Boolean Function Tests
+/// Special Unary Boolean Function Tests
 ///
+
+func Test_ApplyUnaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
+	d := chaining.New()
+	trueAction := func(interface{}) (bool, error) { return true, nil }
+	result := d.ApplyUnaryBool(trueAction, chaining.ActionArg{})
+	assert.True(t, result)
+}
+
+func Test_ApplyUnaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
+	d := chaining.New()
+	falseAction := func(interface{}) (bool, error) { return false, nil }
+	result := d.ApplyUnaryBool(falseAction, chaining.ActionArg{})
+	assert.False(t, result)
+}
+
+func Test_ApplyUnaryBool_PreviousError_ReturnsFalse(t *testing.T) {
+	d := chaining.New()
+	trueAction := func(interface{}) (bool, error) {
+		return true, nil
+	}
+	d.LocalError = errors.New("test error")
+
+	result := d.ApplyUnaryBool(trueAction, chaining.ActionArg{})
+
+	assert.False(t, result)
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Interface Function Tests
+/// Since all capabilities for interface functions are guaranteed by the atomic function,
+/// the goal of these tests is simply to ensure that all chaining methods call the atomic function.
 ///
+
+var numberOfTimesAtomicCalled int
+var suppliedContext *chaining.Context
+var suppliedAction func(interface{}) (interface{}, error)
+var suppliedArg chaining.ActionArg
+var mockContext *chaining.Context
+
+func ResetTestParameters() {
+	numberOfTimesAtomicCalled = 0
+	mockContext = &chaining.Context{
+		AtomicFunc: func(c *chaining.Context, action func(interface{}) (interface{}, error), arg chaining.ActionArg) {
+			numberOfTimesAtomicCalled++
+			result, _ := action(arg.Value)
+			c.PreviousActionResult = &result
+		},
+	}
+}
+
+func Test_ApplyNullary_Normally_CallsAtomic(t *testing.T) {
+	ResetTestParameters()
+	action := func() error { return nil }
+	mockContext.ApplyNullary(action, injectionbehavior.NotSpecified)
+	assert.Equal(t, 1, numberOfTimesAtomicCalled)
+}
+
+func Test_ApplyNullaryIface_Normally_CallsAtomic(t *testing.T) {
+	ResetTestParameters()
+	action := func() (interface{}, error) { return nil, nil }
+	mockContext.ApplyNullaryIface(action, injectionbehavior.NotSpecified)
+	assert.Equal(t, 1, numberOfTimesAtomicCalled)
+}
+
+func Test_ApplyUnary_Normally_CallsAtomic(t *testing.T) {
+	ResetTestParameters()
+	action := func(interface{}) error { return nil }
+	mockContext.ApplyUnary(action, chaining.ActionArg{})
+	assert.Equal(t, 1, numberOfTimesAtomicCalled)
+}
+
+func Test_ApplyUnaryIface_Normally_CallsAtomic(t *testing.T) {
+	ResetTestParameters()
+	action := func(interface{}) (interface{}, error) { return nil, nil }
+	mockContext.ApplyUnaryIface(action, chaining.ActionArg{})
+	assert.Equal(t, 1, numberOfTimesAtomicCalled)
+}
+
+func Test_ApplyNullaryBool_Normally_CallsAtomic(t *testing.T) {
+	ResetTestParameters()
+	action := func() (bool, error) { return false, nil }
+	mockContext.ApplyNullaryBool(action, injectionbehavior.NotSpecified)
+	assert.Equal(t, 1, numberOfTimesAtomicCalled)
+}
+
+func Test_ApplyUnaryBool_Normally_CallsAtomic(t *testing.T) {
+	ResetTestParameters()
+	action := func(interface{}) (bool, error) { return false, nil }
+	mockContext.ApplyUnaryBool(action, chaining.ActionArg{})
+	assert.Equal(t, 1, numberOfTimesAtomicCalled)
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Atomic Function Tests
+/// All chaining methods are ultimately stated in terms of a single atomic function.
+/// Base functionality is guaranteed via the atomic function.
+/// Since the default atomic function is not public, we test it through its public wrapper "ApplyUnaryInterface"
 ///
 
 func Test_AtomicFunction_PreviousError_IgnoresAction(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 // New returns an instance of a chaining Context.
 func New() *Context {
 	return &Context{
-		atomicFunc: atomic,
+		AtomicFunc: atomic,
 	}
 }
 
@@ -32,7 +32,7 @@ func (c *Context) ApplyNullary(action func() error, behavior injectionbehavior.I
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return nil, action()
 	}
-	c.atomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
+	c.AtomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
 }
 
 // ApplyNullaryIface executes an action which takes no arguments and returns a tuple of (interface{}, error).
@@ -46,7 +46,7 @@ func (c *Context) ApplyNullaryIface(action func() (interface{}, error), behavior
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return action()
 	}
-	c.atomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
+	c.AtomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
 }
 
 // ApplyUnary executes an action which takes one argument returns only an error.
@@ -63,7 +63,7 @@ func (c *Context) ApplyUnary(action func(interface{}) error, arg ActionArg) {
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return nil, action(val)
 	}
-	c.atomicFunc(c, restatedAction, arg)
+	c.AtomicFunc(c, restatedAction, arg)
 }
 
 // ApplyUnaryIface executes an action which takes one argument, and returns a tuple of (interface{}, error).
@@ -76,7 +76,7 @@ func (c *Context) ApplyUnary(action func(interface{}) error, arg ActionArg) {
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
 func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error), arg ActionArg) {
-	c.atomicFunc(c, action, arg)
+	c.AtomicFunc(c, action, arg)
 }
 
 // ApplyNullaryBool executes an action which takes no arguments and returns a tuple of (bool, error).
@@ -93,7 +93,7 @@ func (c *Context) ApplyNullaryBool(action func() (bool, error), behavior injecti
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return action()
 	}
-	c.atomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
+	c.AtomicFunc(c, restatedAction, ActionArg{Behavior: behavior})
 	if c.LocalError != nil {
 		return false
 	}
@@ -116,7 +116,10 @@ func (c *Context) ApplyUnaryBool(action func(interface{}) (bool, error), arg Act
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return action(val)
 	}
-	c.atomicFunc(c, restatedAction, arg)
+	c.AtomicFunc(c, restatedAction, arg)
+	if c.LocalError != nil {
+		return false
+	}
 	return (*c.PreviousActionResult).(bool)
 }
 
