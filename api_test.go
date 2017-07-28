@@ -1,31 +1,30 @@
-package errorhandler_test
+package chaining_test
 
 import (
 	"errors"
-	"jecolasurdo/go-deferrederrors/errorhandler/injectionbehavior"
+	"jecolasurdo/go-chaining"
+	"jecolasurdo/go-chaining/injectionbehavior"
 	"testing"
-
-	"jecolasurdo/go-deferrederrors/errorhandler"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_TryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	trueAction := func() (bool, error) { return true, nil }
 	result := d.TryBool(trueAction)
 	assert.True(t, result)
 }
 
 func Test_TryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	falseAction := func() (bool, error) { return false, nil }
 	result := d.TryBool(falseAction)
 	assert.False(t, result)
 }
 
 func Test_TryBool_PreviousError_IgnoresAction(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() (bool, error) {
 		timesActionWasCalled++
@@ -39,7 +38,7 @@ func Test_TryBool_PreviousError_IgnoresAction(t *testing.T) {
 }
 
 func Test_TryBool_PreviousError_ReturnsFalse(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	trueAction := func() (bool, error) {
 		return true, nil
 	}
@@ -51,7 +50,7 @@ func Test_TryBool_PreviousError_ReturnsFalse(t *testing.T) {
 }
 
 func Test_TryBool_ActionErrors_SetsLocalError(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	errorAction := func() (bool, error) { return false, errors.New("test error") }
 
 	d.TryBool(errorAction)
@@ -60,7 +59,7 @@ func Test_TryBool_ActionErrors_SetsLocalError(t *testing.T) {
 }
 
 func Test_TryVoid_NoPreviousError_ExecutesAction(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() error {
 		timesActionWasCalled++
@@ -73,7 +72,7 @@ func Test_TryVoid_NoPreviousError_ExecutesAction(t *testing.T) {
 }
 
 func Test_TryVoid_PreviousError_IgnoresAction(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() error {
 		timesActionWasCalled++
@@ -87,7 +86,7 @@ func Test_TryVoid_PreviousError_IgnoresAction(t *testing.T) {
 }
 
 func Test_TryVoid_ActionErrors_SetsLocalError(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	errorAction := func() error { return errors.New("test error") }
 
 	d.TryVoid(errorAction)
@@ -96,7 +95,7 @@ func Test_TryVoid_ActionErrors_SetsLocalError(t *testing.T) {
 }
 
 func Test_ChainF_PreviousError_IgnoresAction(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func(interface{}) (interface{}, error) {
 		timesActionWasCalled++
@@ -104,32 +103,32 @@ func Test_ChainF_PreviousError_IgnoresAction(t *testing.T) {
 	}
 
 	d.LocalError = errors.New("test error")
-	d.ChainF(action, errorhandler.ActionArg{})
+	d.ChainF(action, chaining.ActionArg{})
 
 	assert.Equal(t, 0, timesActionWasCalled)
 }
 
 func Test_ChainF_NoPreviousError_ExecutesAction(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func(interface{}) (interface{}, error) {
 		timesActionWasCalled++
 		return nil, nil
 	}
 
-	d.ChainF(action, errorhandler.ActionArg{})
+	d.ChainF(action, chaining.ActionArg{})
 
 	assert.Equal(t, 1, timesActionWasCalled)
 }
 
 func Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	injectedValue := ""
 	action := func(value interface{}) (interface{}, error) {
 		injectedValue = value.(string)
 		return nil, nil
 	}
-	argWithBehaviorNotSpecified := errorhandler.ActionArg{}
+	argWithBehaviorNotSpecified := chaining.ActionArg{}
 	simulatedValueOfPreviousActionInChain := "somevalue"
 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
@@ -139,13 +138,13 @@ func Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *
 }
 
 func Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	injectedValue := ""
 	action := func(value interface{}) (interface{}, error) {
 		injectedValue = value.(string)
 		return nil, nil
 	}
-	argWithSpecifiedBehavior := errorhandler.ActionArg{
+	argWithSpecifiedBehavior := chaining.ActionArg{
 		Behavior: injectionbehavior.InjectPreviousResult,
 	}
 	simulatedValueOfPreviousActionInChain := "somevalue"
@@ -157,14 +156,14 @@ func Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *t
 }
 
 func Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	injectedValue := ""
 	action := func(value interface{}) (interface{}, error) {
 		injectedValue = value.(string)
 		return nil, nil
 	}
 	valueSubmittedThroughArg := "valueFromArg"
-	argWithSpecifiedBehavior := errorhandler.ActionArg{
+	argWithSpecifiedBehavior := chaining.ActionArg{
 		Behavior: injectionbehavior.InjectSuppliedValue,
 		Value:    valueSubmittedThroughArg,
 	}
@@ -177,10 +176,10 @@ func Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue
 }
 
 func Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	expectedReturnValue := "expectedReturnValue"
 	action := func(value interface{}) (interface{}, error) { return expectedReturnValue, nil }
-	arg := errorhandler.ActionArg{
+	arg := chaining.ActionArg{
 		Value: "valueFromArg",
 	}
 
@@ -201,7 +200,7 @@ func Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResul
 }
 
 func Test_Flush_Normally_ResetsContext(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	d.LocalError = errors.New("test error")
 	d.PreviousActionResult = "Not nil"
 
@@ -212,7 +211,7 @@ func Test_Flush_Normally_ResetsContext(t *testing.T) {
 }
 
 func Test__Normally_ReturnsErrorAndFinalResult(t *testing.T) {
-	d := new(errorhandler.DeferredErrorContext)
+	d := new(chaining.Context)
 	d.LocalError = errors.New("test error")
 	expectedFinalResult := "FinalResult"
 	d.PreviousActionResult = expectedFinalResult

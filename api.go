@@ -1,14 +1,12 @@
-package errorhandler
+package chaining
 
-import (
-	"jecolasurdo/go-deferrederrors/errorhandler/injectionbehavior"
-)
+import "jecolasurdo/go-chaining/injectionbehavior"
 
 // TryBool executes a func() (bool, error) if no previous Trys have resulted in an error.
 // If previous Trys have resulted in an error, the action is ignored, not executed, and false is returned.
 // Because false is returned when an action is ignored (rather than halting execution), it is important
 // to ensure any downstream methods are also wrapped in Try methods, so they are also ignored.
-func (d *DeferredErrorContext) TryBool(action func() (bool, error)) bool {
+func (d *Context) TryBool(action func() (bool, error)) bool {
 	if d.LocalError != nil {
 		return false
 	}
@@ -20,14 +18,14 @@ func (d *DeferredErrorContext) TryBool(action func() (bool, error)) bool {
 
 // TryVoid executes a func() error action if no previous Trys have resulted in a error.
 // If previous Trys have resulted in an error, the action is ignored and not executed.
-func (d *DeferredErrorContext) TryVoid(action func() error) {
+func (d *Context) TryVoid(action func() error) {
 	if d.LocalError == nil {
 		d.LocalError = action()
 	}
 }
 
 // ChainF does something
-func (d *DeferredErrorContext) ChainF(action func(interface{}) (interface{}, error), arg ActionArg) {
+func (d *Context) ChainF(action func(interface{}) (interface{}, error), arg ActionArg) {
 	if d.LocalError != nil {
 		return
 	}
@@ -43,7 +41,7 @@ func (d *DeferredErrorContext) ChainF(action func(interface{}) (interface{}, err
 }
 
 // Flush returns the context's error and final result, and resets the context back to its default state.
-func (d *DeferredErrorContext) Flush() (interface{}, error) {
+func (d *Context) Flush() (interface{}, error) {
 	localError := d.LocalError
 	finalResult := d.PreviousActionResult
 	d.LocalError = nil
@@ -59,7 +57,7 @@ func (d *DeferredErrorContext) Flush() (interface{}, error) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (d *DeferredErrorContext) ExecNullaryVoid(action func() error) {}
+func (d *Context) ExecNullaryVoid(action func() error) {}
 
 // ExecNullaryIface executes an action which takes no arguments and returns a tuple of (interface{}, error).
 //
@@ -68,7 +66,7 @@ func (d *DeferredErrorContext) ExecNullaryVoid(action func() error) {}
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (d *DeferredErrorContext) ExecNullaryIface(action func() (interface{}, error)) {}
+func (d *Context) ExecNullaryIface(action func() (interface{}, error)) {}
 
 // ExecUnaryVoid executes an action which takes one argument returns only an error.
 //
@@ -80,7 +78,7 @@ func (d *DeferredErrorContext) ExecNullaryIface(action func() (interface{}, erro
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (d *DeferredErrorContext) ExecUnaryVoid(action func(interface{}) error, arg ActionArg) {}
+func (d *Context) ExecUnaryVoid(action func(interface{}) error, arg ActionArg) {}
 
 // ExecUnaryIface executes an action which takes one argument, and returns a tuple of (interface{}, error).
 //
@@ -91,7 +89,7 @@ func (d *DeferredErrorContext) ExecUnaryVoid(action func(interface{}) error, arg
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (d *DeferredErrorContext) ExecUnaryIface(action func(interface{}) (interface{}, error), arg ActionArg) {
+func (d *Context) ExecUnaryIface(action func(interface{}) (interface{}, error), arg ActionArg) {
 }
 
 // ExecNullaryBool executes an action which takes no arguments and returns a tuple of (bool, error).
@@ -104,7 +102,7 @@ func (d *DeferredErrorContext) ExecUnaryIface(action func(interface{}) (interfac
 //
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (d *DeferredErrorContext) ExecNullaryBool(action func() (bool, error)) bool { return false }
+func (d *Context) ExecNullaryBool(action func() (bool, error)) bool { return false }
 
 // ExecUnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
 //
@@ -118,6 +116,6 @@ func (d *DeferredErrorContext) ExecNullaryBool(action func() (bool, error)) bool
 //
 // In addition to threading the (bool, error) tuple into the current context, UnaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (d *DeferredErrorContext) ExecUnaryBool(action func(interface{}) (bool, error), arg ActionArg) bool {
+func (d *Context) ExecUnaryBool(action func(interface{}) (bool, error), arg ActionArg) bool {
 	return false
 }

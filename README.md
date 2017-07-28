@@ -1,5 +1,5 @@
-# go-deferrederrors
-DeferredErrors is a small go package that allows you to defer error handling until the end of a chain of methods.
+# go-chaining
+go-chaining is a small go package that allows you to defer error handling until the end of a chain of methods.
 
 ## Example
 
@@ -44,16 +44,17 @@ func (f *Foo) Flar() error {
 
 // Same nested if statement with deferred error handling.
 func (f *Foo) Flar() error {
-	e := new(errorhandler.DeferredErrorContext)
-	if e.TryBool(f.SomethingIsTrue) {
-		if e.TryBool(f.SomethingElseIsTrue) {
-			e.TryVoid(f.DoSomething)
-			e.TryVoid(f.MakeItRain)
+	e := new(chaining.Context)
+	if e.ExecNullaryBool(f.SomethingIsTrue) {
+		if e.ExecNullaryBool(f.SomethingElseIsTrue) {
+			e.ExecNullaryVoid(f.DoSomething)
+			e.ExecNullaryVoid(f.MakeItRain)
 		}
 	} else {
-		e.TryVoid(f.MakeItRain)
+		e.ExecNullaryVoid(f.MakeItRain)
 	}
-	return e.FlushError()
+    _, err:= e.Flush()
+	return err
 }
 
 ```

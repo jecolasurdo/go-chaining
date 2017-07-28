@@ -1,9 +1,9 @@
-package errorhandler
+package chaining
 
-import "jecolasurdo/go-deferrederrors/errorhandler/injectionbehavior"
+import "jecolasurdo/go-chaining/injectionbehavior"
 
-// DeferredErrorContext is a mechanism for deferring execution of methods if an error condition has been received.
-type DeferredErrorContext struct {
+// Context is a mechanism for deferring execution of methods if an error condition has been received.
+type Context struct {
 	LocalError           error
 	PreviousActionResult interface{}
 }
