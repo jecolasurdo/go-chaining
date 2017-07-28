@@ -58,7 +58,7 @@ func Test_ApplyNullaryBool_ActionErrors_SetsLocalError(t *testing.T) {
 	assert.NotNil(t, d.LocalError)
 }
 
-func Test_TryVoid_NoPreviousError_ExecutesAction(t *testing.T) {
+func Test_ApplyNullary_NoPreviousError_ExecutesAction(t *testing.T) {
 	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() error {
@@ -66,12 +66,12 @@ func Test_TryVoid_NoPreviousError_ExecutesAction(t *testing.T) {
 		return nil
 	}
 
-	d.TryVoid(action)
+	d.ApplyNullary(action)
 
 	assert.Equal(t, 1, timesActionWasCalled)
 }
 
-func Test_TryVoid_PreviousError_IgnoresAction(t *testing.T) {
+func Test_ApplyNullary_PreviousError_IgnoresAction(t *testing.T) {
 	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func() error {
@@ -80,16 +80,16 @@ func Test_TryVoid_PreviousError_IgnoresAction(t *testing.T) {
 	}
 
 	d.LocalError = errors.New("test error")
-	d.TryVoid(action)
+	d.ApplyNullary(action)
 
 	assert.Equal(t, 0, timesActionWasCalled)
 }
 
-func Test_TryVoid_ActionErrors_SetsLocalError(t *testing.T) {
+func Test_ApplyNullary_ActionErrors_SetsLocalError(t *testing.T) {
 	d := new(chaining.Context)
 	errorAction := func() error { return errors.New("test error") }
 
-	d.TryVoid(errorAction)
+	d.ApplyNullary(errorAction)
 
 	assert.NotNil(t, d.LocalError)
 }

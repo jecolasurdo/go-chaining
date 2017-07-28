@@ -2,14 +2,6 @@ package chaining
 
 import "jecolasurdo/go-chaining/injectionbehavior"
 
-// TryVoid executes a func() error action if no previous Trys have resulted in a error.
-// If previous Trys have resulted in an error, the action is ignored and not executed.
-func (c *Context) TryVoid(action func() error) {
-	if c.LocalError == nil {
-		c.LocalError = action()
-	}
-}
-
 // Flush returns the context's error and final result, and resets the context back to its default state.
 func (c *Context) Flush() (interface{}, error) {
 	localError := c.LocalError
@@ -27,7 +19,11 @@ func (c *Context) Flush() (interface{}, error) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) ApplyNullary(action func() error) {}
+func (c *Context) ApplyNullary(action func() error) {
+	if c.LocalError == nil {
+		c.LocalError = action()
+	}
+}
 
 // ApplyNullaryIface executes an action which takes no arguments and returns a tuple of (interface{}, error).
 //
