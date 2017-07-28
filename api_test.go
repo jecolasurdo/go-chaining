@@ -2,9 +2,10 @@ package chaining_test
 
 import (
 	"errors"
+	"testing"
+
 	"jecolasurdo/go-chaining"
 	"jecolasurdo/go-chaining/injectionbehavior"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

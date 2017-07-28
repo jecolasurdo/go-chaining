@@ -110,7 +110,9 @@ func (c *Context) ApplyNullaryBool(action func() (bool, error)) bool {
 // In addition to threading the (bool, error) tuple into the current context, UnaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
 func (c *Context) ApplyUnaryBool(action func(interface{}) (bool, error), arg ActionArg) bool {
-	c.LocalError = errors.New("ApplyUnaryBool not implemented")
-	c.PreviousActionResult = nil
-	return false
+	restatedAction := func(val interface{}) (interface{}, error) {
+		return action(val)
+	}
+	c.ApplyUnaryIface(restatedAction, arg)
+	return c.PreviousActionResult.(bool)
 }
