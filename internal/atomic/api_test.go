@@ -3,6 +3,7 @@ package atomic_test
 import (
 	"errors"
 	chaining "jecolasurdo/go-chaining"
+	"jecolasurdo/go-chaining/injectionbehavior"
 	"jecolasurdo/go-chaining/internal/atomic"
 	"testing"
 
@@ -55,23 +56,24 @@ func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsNotSpecified_InjectsPrevious
 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
 }
 
-// func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
-// 	d := new(chaining.Context)
-// 	injectedValue := ""
-// 	action := func(value interface{}) (interface{}, error) {
-// 		injectedValue = value.(string)
-// 		return nil, nil
-// 	}
-// 	argWithSpecifiedBehavior := chaining.ActionArg{
-// 		Behavior: injectionbehavior.InjectPreviousResult,
-// 	}
-// 	simulatedValueOfPreviousActionInChain := "somevalue"
-// 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
+func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
+	a := new(atomic.Context)
+	c := new(chaining.Context)
+	injectedValue := ""
+	action := func(value interface{}) (interface{}, error) {
+		injectedValue = value.(string)
+		return nil, nil
+	}
+	argWithSpecifiedBehavior := chaining.ActionArg{
+		Behavior: injectionbehavior.InjectPreviousResult,
+	}
+	simulatedValueOfPreviousActionInChain := "somevalue"
+	c.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
-// 	d.ApplyUnaryIface(action, argWithSpecifiedBehavior)
+	a.ApplyUnaryIface(action, &argWithSpecifiedBehavior, c)
 
-// 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
-// }
+	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
+}
 
 // func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
 // 	d := new(chaining.Context)
