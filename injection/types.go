@@ -1,3 +1,4 @@
+// Package injection provides mechanism for controlling how values are threaded through the execution chain.
 package injection
 
 // Behavior instructs the system on how to thread values through the chain of actions.

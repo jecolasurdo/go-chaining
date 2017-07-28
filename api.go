@@ -1,3 +1,4 @@
+// Package chaining provides a mechanism for chaining functions while deferring error handling to the end of execution.
 package chaining
 
 import (
