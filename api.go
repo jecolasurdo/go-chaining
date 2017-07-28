@@ -1,6 +1,28 @@
 package chaining
 
-import "jecolasurdo/go-chaining/injectionbehavior"
+import (
+	"jecolasurdo/go-chaining/injectionbehavior"
+)
+
+// New returns an instance of a chaining Context.
+func New() *Context {
+	c := new(Context)
+	c.atomicFunc = func(action func(interface{}) (interface{}, error), arg ActionArg) {
+		if c.LocalError != nil {
+			return
+		}
+		var valueToInject interface{}
+		if arg.Behavior == injectionbehavior.InjectSuppliedValue {
+			valueToInject = arg.Value
+		} else {
+			valueToInject = c.PreviousActionResult
+		}
+		result, err := action(valueToInject)
+		c.LocalError = err
+		c.PreviousActionResult = &result
+	}
+	return c
+}
 
 // Flush returns the context's error and final result, and resets the context back to its default state.
 func (c *Context) Flush() (interface{}, error) {
@@ -78,7 +100,7 @@ func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error),
 	}
 	result, err := action(valueToInject)
 	c.LocalError = err
-	c.PreviousActionResult = result
+	c.PreviousActionResult = &result
 }
 
 // ApplyNullaryBool executes an action which takes no arguments and returns a tuple of (bool, error).
@@ -91,12 +113,15 @@ func (c *Context) ApplyUnaryIface(action func(interface{}) (interface{}, error),
 //
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (c *Context) ApplyNullaryBool(action func() (bool, error), arg ActionArg) bool {
+func (c *Context) ApplyNullaryBool(action func() (bool, error), behavior injectionbehavior.InjectionBehavior) bool {
 	restatedAction := func(val interface{}) (interface{}, error) {
 		return action()
 	}
-	c.ApplyUnaryIface(restatedAction, arg)
-	return c.PreviousActionResult.(bool)
+	c.ApplyUnaryIface(restatedAction, ActionArg{Behavior: behavior})
+	if c.LocalError != nil {
+		return false
+	}
+	return (*c.PreviousActionResult).(bool)
 }
 
 // ApplyUnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
@@ -116,5 +141,5 @@ func (c *Context) ApplyUnaryBool(action func(interface{}) (bool, error), arg Act
 		return action(val)
 	}
 	c.ApplyUnaryIface(restatedAction, arg)
-	return c.PreviousActionResult.(bool)
+	return (*c.PreviousActionResult).(bool)
 }

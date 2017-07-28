@@ -1,11 +1,14 @@
 package chaining
 
-import "jecolasurdo/go-chaining/injectionbehavior"
+import (
+	"jecolasurdo/go-chaining/injectionbehavior"
+)
 
 // Context is a mechanism for deferring execution of methods if an error condition has been received.
 type Context struct {
+	atomicFunc           func(func(interface{}) (interface{}, error), ActionArg)
 	LocalError           error
-	PreviousActionResult interface{}
+	PreviousActionResult *interface{}
 }
 
 // ActionArg is the information passed into a chain function that describe the intended behavior.
