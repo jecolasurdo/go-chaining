@@ -94,7 +94,7 @@ func Test_TryVoid_ActionErrors_SetsLocalError(t *testing.T) {
 	assert.NotNil(t, d.LocalError)
 }
 
-func Test_ChainF_PreviousError_IgnoresAction(t *testing.T) {
+func Test_ApplyUnaryIface_PreviousError_IgnoresAction(t *testing.T) {
 	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func(interface{}) (interface{}, error) {
@@ -103,12 +103,12 @@ func Test_ChainF_PreviousError_IgnoresAction(t *testing.T) {
 	}
 
 	d.LocalError = errors.New("test error")
-	d.ChainF(action, chaining.ActionArg{})
+	d.ApplyUnaryIface(action, chaining.ActionArg{})
 
 	assert.Equal(t, 0, timesActionWasCalled)
 }
 
-func Test_ChainF_NoPreviousError_ExecutesAction(t *testing.T) {
+func Test_ApplyUnaryIface_NoPreviousError_ExecutesAction(t *testing.T) {
 	d := new(chaining.Context)
 	timesActionWasCalled := 0
 	action := func(interface{}) (interface{}, error) {
@@ -116,12 +116,12 @@ func Test_ChainF_NoPreviousError_ExecutesAction(t *testing.T) {
 		return nil, nil
 	}
 
-	d.ChainF(action, chaining.ActionArg{})
+	d.ApplyUnaryIface(action, chaining.ActionArg{})
 
 	assert.Equal(t, 1, timesActionWasCalled)
 }
 
-func Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
+func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *testing.T) {
 	d := new(chaining.Context)
 	injectedValue := ""
 	action := func(value interface{}) (interface{}, error) {
@@ -132,12 +132,12 @@ func Test_ChainF_NoPreviousError_BehaviorIsNotSpecified_InjectsPreviousValue(t *
 	simulatedValueOfPreviousActionInChain := "somevalue"
 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
-	d.ChainF(action, argWithBehaviorNotSpecified)
+	d.ApplyUnaryIface(action, argWithBehaviorNotSpecified)
 
 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
 }
 
-func Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
+func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *testing.T) {
 	d := new(chaining.Context)
 	injectedValue := ""
 	action := func(value interface{}) (interface{}, error) {
@@ -150,12 +150,12 @@ func Test_ChainF_NoPreviousError_BehaviorIsUsePrevious_InjectsPreviousValue(t *t
 	simulatedValueOfPreviousActionInChain := "somevalue"
 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
-	d.ChainF(action, argWithSpecifiedBehavior)
+	d.ApplyUnaryIface(action, argWithSpecifiedBehavior)
 
 	assert.Equal(t, simulatedValueOfPreviousActionInChain, injectedValue)
 }
 
-func Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
+func Test_ApplyUnaryIface_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue(t *testing.T) {
 	d := new(chaining.Context)
 	injectedValue := ""
 	action := func(value interface{}) (interface{}, error) {
@@ -170,12 +170,12 @@ func Test_ChainF_NoPreviousError_BehaviorIsOverridePrevious_InjectsSuppliedValue
 	simulatedValueOfPreviousActionInChain := "previousValue"
 	d.PreviousActionResult = simulatedValueOfPreviousActionInChain
 
-	d.ChainF(action, argWithSpecifiedBehavior)
+	d.ApplyUnaryIface(action, argWithSpecifiedBehavior)
 
 	assert.Equal(t, valueSubmittedThroughArg, injectedValue)
 }
 
-func Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
+func Test_ApplyUnaryIface_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResult(t *testing.T) {
 	d := new(chaining.Context)
 	expectedReturnValue := "expectedReturnValue"
 	action := func(value interface{}) (interface{}, error) { return expectedReturnValue, nil }
@@ -185,17 +185,17 @@ func Test_ChainF_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousActionResul
 
 	d.PreviousActionResult = nil
 	arg.Behavior = injectionbehavior.InjectSuppliedValue
-	d.ChainF(action, arg)
+	d.ApplyUnaryIface(action, arg)
 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
 
 	d.PreviousActionResult = nil
 	arg.Behavior = injectionbehavior.InjectPreviousResult
-	d.ChainF(action, arg)
+	d.ApplyUnaryIface(action, arg)
 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
 
 	d.PreviousActionResult = nil
 	arg.Behavior = injectionbehavior.NotSpecified
-	d.ChainF(action, arg)
+	d.ApplyUnaryIface(action, arg)
 	assert.Equal(t, expectedReturnValue, d.PreviousActionResult)
 }
 

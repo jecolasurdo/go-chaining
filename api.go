@@ -24,22 +24,6 @@ func (c *Context) TryVoid(action func() error) {
 	}
 }
 
-// ChainF does something
-func (c *Context) ChainF(action func(interface{}) (interface{}, error), arg ActionArg) {
-	if c.LocalError != nil {
-		return
-	}
-	var valueToInject interface{}
-	if arg.Behavior == injectionbehavior.InjectSuppliedValue {
-		valueToInject = arg.Value
-	} else {
-		valueToInject = c.PreviousActionResult
-	}
-	result, err := action(valueToInject)
-	c.LocalError = err
-	c.PreviousActionResult = result
-}
-
 // Flush returns the context's error and final result, and resets the context back to its default state.
 func (c *Context) Flush() (interface{}, error) {
 	localError := c.LocalError
