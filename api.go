@@ -96,6 +96,7 @@ func (c *Context) ApplyNullaryBool(action func() (bool, error), arg ActionArg) b
 		return action()
 	}
 	c.ApplyUnaryIface(restatedAction, arg)
+	return c.PreviousActionResult.(bool)
 }
 
 // ApplyUnaryBool executes an action which takes one argument and returns a tuple of (bool, error).
