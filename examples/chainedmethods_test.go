@@ -31,6 +31,7 @@ func Test_ChainItAllTogether(t *testing.T) {
 		Value:    &initialValue,
 		Behavior: behavior.InjectSuppliedValue,
 	}
+
 	chain.ApplyUnaryIface(addOne, initialBehavior)
 	chain.ApplyUnaryIface(multiplyBySix, c.ActionArg{})
 	chain.ApplyUnaryIface(convertToString, c.ActionArg{})
