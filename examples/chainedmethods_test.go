@@ -32,9 +32,9 @@ func Test_ChainItAllTogether(t *testing.T) {
 		Behavior: behavior.InjectSuppliedValue,
 	}
 
-	chain.ApplyUnaryIface(addOne, initialBehavior)
-	chain.ApplyUnaryIface(multiplyBySix, c.ActionArg{})
-	chain.ApplyUnaryIface(convertToString, c.ActionArg{})
+	chain.UIface(addOne, initialBehavior)
+	chain.UIface(multiplyBySix, c.ActionArg{})
+	chain.UIface(convertToString, c.ActionArg{})
 
 	result, err := chain.Flush()
 	assert.Equal(t, "12", (*result).(string))

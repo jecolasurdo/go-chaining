@@ -45,13 +45,13 @@ package examples
 // // Same nested if statements with deferred error handling.
 // func (f *foo) chainedFlar() error {
 // 	c := new(chaining.Context)
-// 	if c.ApplyNullaryBool(f.somethingIsTrue, behavior.NotSpecified) {
-// 		if c.ApplyNullaryBool(f.somethingElseIsTrue, behavior.NotSpecified) {
-// 			c.ApplyNullary(f.doSomething, behavior.NotSpecified)
-// 			c.ApplyNullary(f.makeItRain, behavior.NotSpecified)
+// 	if c.NBool(f.somethingIsTrue, behavior.NotSpecified) {
+// 		if c.NBool(f.somethingElseIsTrue, behavior.NotSpecified) {
+// 			c.N(f.doSomething, behavior.NotSpecified)
+// 			c.N(f.makeItRain, behavior.NotSpecified)
 // 		}
 // 	} else {
-// 		c.ApplyNullary(f.makeItRain, behavior.NotSpecified)
+// 		c.N(f.makeItRain, behavior.NotSpecified)
 // 	}
 // 	_, err := c.Flush()
 // 	return err
