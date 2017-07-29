@@ -190,38 +190,38 @@ func Test_ApplyUnaryBool_Normally_CallsAtomic(t *testing.T) {
 	assert.Equal(t, 1, numberOfTimesAtomicCalled)
 }
 
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /// Special Nullary Boolean Function Tests
-// ///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Special Nullary Boolean Function Tests
+///
 
-// func Test_ApplyNullaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
-// 	d := chaining.New()
-// 	True := true
-// 	trueAction := func() (*bool, error) { return &True, nil }
-// 	result := d.ApplyNullaryBool(trueAction, behavior.NotSpecified)
-// 	assert.True(t, result)
-// }
+func Test_ApplyNullaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
+	d := chaining.New()
+	True := true
+	trueAction := func() (*bool, error) { return &True, nil }
+	result := d.ApplyNullaryBool(trueAction, behavior.NotSpecified)
+	assert.True(t, result)
+}
 
-// func Test_ApplyNullaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
-// 	d := chaining.New()
-// 	False := false
-// 	falseAction := func() (*bool, error) { return &False, nil }
-// 	result := d.ApplyNullaryBool(falseAction, behavior.NotSpecified)
-// 	assert.False(t, result)
-// }
+func Test_ApplyNullaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
+	d := chaining.New()
+	False := false
+	falseAction := func() (*bool, error) { return &False, nil }
+	result := d.ApplyNullaryBool(falseAction, behavior.NotSpecified)
+	assert.False(t, result)
+}
 
-// func Test_ApplyNullaryBool_PreviousError_ReturnsFalse(t *testing.T) {
-// 	d := chaining.New()
-// 	trueAction := func() (*bool, error) {
-// 		True := true
-// 		return &True, nil
-// 	}
+func Test_ApplyNullaryBool_PreviousError_ReturnsFalse(t *testing.T) {
+	d := chaining.New()
+	trueAction := func() (*bool, error) {
+		True := true
+		return &True, nil
+	}
 
-// 	d.LocalError = errors.New("test error")
-// 	result := d.ApplyNullaryBool(trueAction, behavior.NotSpecified)
+	d.LocalError = errors.New("test error")
+	result := d.ApplyNullaryBool(trueAction, behavior.NotSpecified)
 
-// 	assert.False(t, result)
-// }
+	assert.False(t, result)
+}
 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // /// Special Unary Boolean Function Tests
