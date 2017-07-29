@@ -16,8 +16,8 @@ In order to setup error curying, it also made sense to setup a mechanism for cur
 
 In the end, while the package works as designed, I find two things make it a bit unwieldy to use.
  - It relies heavily on the empty interface (`interface{}`) to handle argument currying in a somewhat generic fashion.
-  - I don't really like that you lose compile time type checking with this package, but such is life without true generics.
+   - I don't really like that you lose compile time type checking with this package, but such is life without true generics.
  - Because Go doesn't support method overloading, I had to deal with some degree of method expansion.
-  - Due to this, giving the methods names that are descriptive while also not too wordy or long was extremely difficult.
-  - A constant battle began in trying to find a good balance between method name clarity and the expressiveness of the code consuming the methods.
-  - In the end, I don't think I got either of those things to a good poin
+   - Due to this, giving the methods names that are descriptive while also not too wordy or long was extremely difficult.
+   - A constant battle began in trying to find a good balance between method name clarity and the expressiveness of the code consuming the methods.
+   - In the end, I don't think I got either of those things to a good poin
