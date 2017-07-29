@@ -223,38 +223,38 @@ func Test_ApplyNullaryBool_PreviousError_ReturnsFalse(t *testing.T) {
 	assert.False(t, result)
 }
 
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /// Special Unary Boolean Function Tests
-// ///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Special Unary Boolean Function Tests
+///
 
-// func Test_ApplyUnaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
-// 	d := chaining.New()
-// 	True := true
-// 	trueAction := func(*interface{}) (*bool, error) { return &True, nil }
-// 	result := d.ApplyUnaryBool(trueAction, chaining.ActionArg{})
-// 	assert.True(t, result)
-// }
+func Test_ApplyUnaryBool_ActionTrueNoError_ReturnsTrue(t *testing.T) {
+	d := chaining.New()
+	True := true
+	trueAction := func(*interface{}) (*bool, error) { return &True, nil }
+	result := d.ApplyUnaryBool(trueAction, chaining.ActionArg{})
+	assert.True(t, result)
+}
 
-// func Test_ApplyUnaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
-// 	d := chaining.New()
-// 	False := false
-// 	falseAction := func(*interface{}) (*bool, error) { return &False, nil }
-// 	result := d.ApplyUnaryBool(falseAction, chaining.ActionArg{})
-// 	assert.False(t, result)
-// }
+func Test_ApplyUnaryBool_ActionFalseNoError_ReturnsFalse(t *testing.T) {
+	d := chaining.New()
+	False := false
+	falseAction := func(*interface{}) (*bool, error) { return &False, nil }
+	result := d.ApplyUnaryBool(falseAction, chaining.ActionArg{})
+	assert.False(t, result)
+}
 
-// func Test_ApplyUnaryBool_PreviousError_ReturnsFalse(t *testing.T) {
-// 	d := chaining.New()
-// 	trueAction := func(*interface{}) (*bool, error) {
-// 		True := true
-// 		return &True, nil
-// 	}
-// 	d.LocalError = errors.New("test error")
+func Test_ApplyUnaryBool_PreviousError_ReturnsFalse(t *testing.T) {
+	d := chaining.New()
+	trueAction := func(*interface{}) (*bool, error) {
+		True := true
+		return &True, nil
+	}
+	d.LocalError = errors.New("test error")
 
-// 	result := d.ApplyUnaryBool(trueAction, chaining.ActionArg{})
+	result := d.ApplyUnaryBool(trueAction, chaining.ActionArg{})
 
-// 	assert.False(t, result)
-// }
+	assert.False(t, result)
+}
 
 // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // /// Flush Tests
