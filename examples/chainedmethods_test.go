@@ -1,7 +1,6 @@
 package examples
 
 import (
-	"fmt"
 	c "jecolasurdo/go-chaining"
 	"jecolasurdo/go-chaining/behavior"
 	"strconv"
@@ -25,11 +24,6 @@ func convertToString(value *interface{}) (*interface{}, error) {
 	return &result, nil
 }
 
-func sendToThePrinter(value *interface{}) error {
-	_, err := fmt.Print(value)
-	return err
-}
-
 func Test_ChainItAllTogether(t *testing.T) {
 	chain := c.New()
 	var initialValue interface{} = 1
@@ -38,11 +32,10 @@ func Test_ChainItAllTogether(t *testing.T) {
 		Behavior: behavior.InjectSuppliedValue,
 	}
 	chain.ApplyUnaryIface(addOne, initialBehavior)
-	// chain.ApplyUnaryIface(multiplyBySix, c.ActionArg{})
-	// chain.ApplyUnaryIface(convertToString, c.ActionArg{})
-	// chain.ApplyUnary(sendToThePrinter, c.ActionArg{})
+	chain.ApplyUnaryIface(multiplyBySix, c.ActionArg{})
+	chain.ApplyUnaryIface(convertToString, c.ActionArg{})
 
 	result, err := chain.Flush()
-	assert.Equal(t, 2, (*result).(int))
+	assert.Equal(t, "12", (*result).(string))
 	assert.Nil(t, err)
 }
