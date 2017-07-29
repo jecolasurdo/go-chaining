@@ -130,15 +130,15 @@ func Test_AtomicFunction_NoPreviousError_ForAnySpecifiedBehavior_SetsPreviousAct
 ///
 
 var numberOfTimesAtomicCalled int
-var suppliedContext *chaining.Context
+var suppliedContext *chaining.Chain
 var suppliedAction func(interface{}) (interface{}, error)
 var suppliedArg chaining.ActionArg
-var mockContext *chaining.Context
+var mockContext *chaining.Chain
 
 func ResetTestParameters() {
 	numberOfTimesAtomicCalled = 0
-	mockContext = &chaining.Context{
-		AtomicFunc: func(c *chaining.Context, action func(*interface{}) (*interface{}, error), arg chaining.ActionArg) {
+	mockContext = &chaining.Chain{
+		AtomicFunc: func(c *chaining.Chain, action func(*interface{}) (*interface{}, error), arg chaining.ActionArg) {
 			numberOfTimesAtomicCalled++
 			result, _ := action(arg.Value)
 			c.PreviousActionResult = result

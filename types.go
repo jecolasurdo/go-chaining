@@ -2,9 +2,9 @@ package chaining
 
 import "jecolasurdo/go-chaining/behavior"
 
-// Context is a mechanism for deferring execution of methods if an error condition has been received.
-type Context struct {
-	AtomicFunc           func(*Context, func(*interface{}) (*interface{}, error), ActionArg)
+// Chain is a mechanism for deferring execution of methods if an error condition has been received.
+type Chain struct {
+	AtomicFunc           func(*Chain, func(*interface{}) (*interface{}, error), ActionArg)
 	LocalError           error
 	PreviousActionResult *interface{}
 }

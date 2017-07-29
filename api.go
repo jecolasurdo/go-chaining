@@ -6,14 +6,14 @@ import (
 )
 
 // New returns an instance of a chaining Context.
-func New() *Context {
-	return &Context{
+func New() *Chain {
+	return &Chain{
 		AtomicFunc: atomic,
 	}
 }
 
 // Flush returns the context's error and final result, and resets the context back to its default state.
-func (c *Context) Flush() (*interface{}, error) {
+func (c *Chain) Flush() (*interface{}, error) {
 	localError := c.LocalError
 	finalResult := c.PreviousActionResult
 	c.LocalError = nil
@@ -29,7 +29,7 @@ func (c *Context) Flush() (*interface{}, error) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) N(action func() error, behavior behavior.InjectionOption) {
+func (c *Chain) N(action func() error, behavior behavior.InjectionOption) {
 	restatedAction := func(val *interface{}) (*interface{}, error) {
 		return nil, action()
 	}
@@ -43,7 +43,7 @@ func (c *Context) N(action func() error, behavior behavior.InjectionOption) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) NIface(action func() (*interface{}, error), behavior behavior.InjectionOption) {
+func (c *Chain) NIface(action func() (*interface{}, error), behavior behavior.InjectionOption) {
 	restatedAction := func(val *interface{}) (*interface{}, error) {
 		return action()
 	}
@@ -60,7 +60,7 @@ func (c *Context) NIface(action func() (*interface{}, error), behavior behavior.
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) U(action func(*interface{}) error, arg ActionArg) {
+func (c *Chain) U(action func(*interface{}) error, arg ActionArg) {
 	restatedAction := func(val *interface{}) (*interface{}, error) {
 		return nil, action(val)
 	}
@@ -76,7 +76,7 @@ func (c *Context) U(action func(*interface{}) error, arg ActionArg) {
 //
 // The error returned by the supplied action is also applied to the current context.
 // If error is not nil, subsequent actions executed within the same context will be ignored.
-func (c *Context) UIface(action func(*interface{}) (*interface{}, error), arg ActionArg) {
+func (c *Chain) UIface(action func(*interface{}) (*interface{}, error), arg ActionArg) {
 	c.AtomicFunc(c, action, arg)
 }
 
@@ -90,7 +90,7 @@ func (c *Context) UIface(action func(*interface{}) (*interface{}, error), arg Ac
 //
 // In addition to threading the (bool, error) tuple into the current context, NullaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (c *Context) NBool(action func() (*bool, error), behavior behavior.InjectionOption) bool {
+func (c *Chain) NBool(action func() (*bool, error), behavior behavior.InjectionOption) bool {
 	restatedAction := func(*interface{}) (*bool, error) {
 		return action()
 	}
@@ -109,7 +109,7 @@ func (c *Context) NBool(action func() (*bool, error), behavior behavior.Injectio
 //
 // In addition to threading the (bool, error) tuple into the current context, UnaryBool itself also returns a bool.
 // This is useful for inlining the method in boolean statements.
-func (c *Context) UBool(action func(*interface{}) (*bool, error), arg ActionArg) bool {
+func (c *Chain) UBool(action func(*interface{}) (*bool, error), arg ActionArg) bool {
 	restatedAction := func(val *interface{}) (*interface{}, error) {
 		r, err := action(val)
 		var result interface{} = r
@@ -122,7 +122,7 @@ func (c *Context) UBool(action func(*interface{}) (*bool, error), arg ActionArg)
 	return *((*c.PreviousActionResult).(*bool))
 }
 
-func atomic(c *Context, action func(*interface{}) (*interface{}, error), arg ActionArg) {
+func atomic(c *Chain, action func(*interface{}) (*interface{}, error), arg ActionArg) {
 	if c.LocalError != nil {
 		return
 	}
