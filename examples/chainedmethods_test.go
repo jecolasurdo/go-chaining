@@ -10,19 +10,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func addOne(value interface{}) (interface{}, error) {
-	return value.(int) + 1, nil
+func addOne(value *interface{}) (*interface{}, error) {
+	var result interface{} = (*value).(int) + 1
+	return &result, nil
 }
 
-func multiplyBySix(value interface{}) (interface{}, error) {
-	return value.(int) * 6, nil
+func multiplyBySix(value *interface{}) (*interface{}, error) {
+	var result interface{} = (*value).(int) * 6
+	return &result, nil
 }
 
-func convertToString(value interface{}) (interface{}, error) {
-	return strconv.Itoa(value.(int)), nil
+func convertToString(value *interface{}) (*interface{}, error) {
+	var result interface{} = strconv.Itoa((*value).(int))
+	return &result, nil
 }
 
-func sendToThePrinter(value interface{}) error {
+func sendToThePrinter(value *interface{}) error {
 	_, err := fmt.Print(value)
 	return err
 }
@@ -31,7 +34,7 @@ func Test_ChainItAllTogether(t *testing.T) {
 	chain := c.New()
 	var initialValue interface{} = 1
 	initialBehavior := c.ActionArg{
-		Value:    initialValue,
+		Value:    &initialValue,
 		Behavior: behavior.InjectSuppliedValue,
 	}
 	chain.ApplyUnaryIface(addOne, initialBehavior)
@@ -40,9 +43,6 @@ func Test_ChainItAllTogether(t *testing.T) {
 	// chain.ApplyUnary(sendToThePrinter, c.ActionArg{})
 
 	result, err := chain.Flush()
-	//_, ok := result.(interface{}).
-	//assert.True(t, ok)
-	var flar interface{} = 2
-	assert.Equal(t, flar, result)
+	assert.Equal(t, 2, (*result).(int))
 	assert.Nil(t, err)
 }
