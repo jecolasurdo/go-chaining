@@ -256,31 +256,31 @@ func Test_ApplyUnaryBool_PreviousError_ReturnsFalse(t *testing.T) {
 	assert.False(t, result)
 }
 
-// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /// Flush Tests
-// ///
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Flush Tests
+///
 
-// func Test_Flush_Normally_ResetsContext(t *testing.T) {
-// 	d := chaining.New()
-// 	d.LocalError = errors.New("test error")
+func Test_Flush_Normally_ResetsContext(t *testing.T) {
+	d := chaining.New()
+	d.LocalError = errors.New("test error")
 
-// 	var notNilValue interface{} = "Not nil"
-// 	d.PreviousActionResult = &notNilValue
+	var notNilValue interface{} = "Not nil"
+	d.PreviousActionResult = &notNilValue
 
-// 	d.Flush()
+	d.Flush()
 
-// 	assert.Nil(t, d.LocalError)
-// 	assert.Nil(t, d.PreviousActionResult)
-// }
+	assert.Nil(t, d.LocalError)
+	assert.Nil(t, d.PreviousActionResult)
+}
 
-// func Test_Flush_Normally_ReturnsErrorAndFinalResult(t *testing.T) {
-// 	d := chaining.New()
-// 	d.LocalError = errors.New("test error")
-// 	var expectedFinalResult interface{} = "FinalResult"
-// 	d.PreviousActionResult = &expectedFinalResult
+func Test_Flush_Normally_ReturnsErrorAndFinalResult(t *testing.T) {
+	d := chaining.New()
+	d.LocalError = errors.New("test error")
+	var expectedFinalResult interface{} = "FinalResult"
+	d.PreviousActionResult = &expectedFinalResult
 
-// 	result, err := d.Flush()
+	result, err := d.Flush()
 
-// 	assert.NotNil(t, err)
-// 	assert.Equal(t, &expectedFinalResult, result)
-// }
+	assert.NotNil(t, err)
+	assert.Equal(t, &expectedFinalResult, result)
+}
