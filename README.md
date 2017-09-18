@@ -1,4 +1,8 @@
+This package was a naive experiment from when I was in the early stages of learning Go.
+I have since learned more effective error handling strategies, and don't recommend the use of this package. I keep it here for posterity, however.
+
 # go-chaining
+
 go-chaining is a small go package that allows you to defer error handling until the end of a chain of methods.
 The package also allows you to cury the output of one method to the input of the next method in the chain.
 
@@ -20,4 +24,4 @@ In the end, while the package works as designed, I find two things make it a bit
  - Because Go doesn't support method overloading, I had to deal with some degree of method expansion.
    - Due to this, giving the methods names that are descriptive while also not too wordy or long was extremely difficult.
    - A constant battle began in trying to find a good balance between method name clarity and the expressiveness of the code consuming the methods.
-   - In the end, I don't think I got either of those things to a good poin
+   - In the end, I don't think I got either of those things to a good point
